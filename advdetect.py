@@ -2,10 +2,22 @@ import cv2 as cv
 import numpy as np
 
 # Load the image
-img = cv.imread('images/rb_021.jpg')
+img = cv.imread('images/rb_016.jpg')
+
+# Check the dimensions of the input image
+max_width = 1920  # Maximum width for the input image
+max_height = 1080  # Maximum height for the input image
+
+if img.shape[1] > max_width or img.shape[0] > max_height:
+    # Calculate the scaling factor to resize the image
+    scale_factor = min(max_width / img.shape[1], max_height / img.shape[0])
+
+    # Resize the image
+    img = cv.resize(img, None, fx=scale_factor, fy=scale_factor, interpolation=cv.INTER_AREA)
 
 # Apply median filtering to reduce noise
 median_filtered = cv.medianBlur(img, 11)
+
 
 # Convert the filtered image to HSV color space
 hsv = cv.cvtColor(median_filtered, cv.COLOR_BGR2HSV)
