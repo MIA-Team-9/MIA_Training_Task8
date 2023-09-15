@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 
 # Load the image
-img = cv.imread('images/rb_016.jpg')
+img = cv.imread('images/rb_021.jpg')
 
 # Check the dimensions of the input image
 max_width = 1920  # Maximum width for the input image
@@ -16,8 +16,7 @@ if img.shape[1] > max_width or img.shape[0] > max_height:
     img = cv.resize(img, None, fx=scale_factor, fy=scale_factor, interpolation=cv.INTER_AREA)
 
 # Apply median filtering to reduce noise
-median_filtered = cv.medianBlur(img, 11)
-
+median_filtered = cv.medianBlur(img, 9)
 
 # Convert the filtered image to HSV color space
 hsv = cv.cvtColor(median_filtered, cv.COLOR_BGR2HSV)
@@ -27,7 +26,7 @@ lower_blue = np.array([110, 50, 50])  # Adjust the HSV range for blue
 upper_blue = np.array([130, 255, 255])  # Adjust the HSV range for blue
 
 lower_red = np.array([0, 50, 150])  # Adjust the HSV range for red
-upper_red = np.array([9, 255, 255])  # Adjust the HSV range for red
+upper_red = np.array([9, 25500, 255])  # Adjust the HSV range for red
 
 # Threshold the HSV image to get the blue and red balls' colors
 blue_mask = cv.inRange(hsv, lower_blue, upper_blue)
@@ -105,10 +104,13 @@ red_rectangles = [rect for rect in red_rectangles if min_radius <= (rect[2] + re
 result_image = median_filtered.copy()
 for x, y, w, h in blue_rectangles:
     cv.rectangle(result_image, (x, y), (x + w, y + h), (0, 255, 0), 2)  # Draw blue rectangles
+    cv.putText(result_image, "Blue Ball", (x, y - 10), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)  # Add label
+
 for x, y, w, h in red_rectangles:
     cv.rectangle(result_image, (x, y), (x + w, y + h), (255, 192, 203), 2)  # Draw red rectangles
+    cv.putText(result_image, "Red Ball", (x, y - 10), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 192, 203), 2)  # Add label
 
-# Display the original image with rectangles around the blue and red balls
+# Display the original image with rectangles and labels around the blue and red balls
 cv.imshow('Image with Ball Detection', result_image)
 cv.waitKey(0)
 cv.destroyAllWindows()
