@@ -49,10 +49,8 @@ Then we use any progroam to measure the width of the pole in pixels
 
 If we assume that the the poles diameters are (15cm,10cm) and the HFOV is 72 using the the following formula 
 
-$$
 D = (d * W) / (2 * tan(FOV / 2))
 
-$$
 
 - `D` is the distance from the camera to the object.
 - `d` is the actual diameter of the object.
