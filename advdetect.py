@@ -1,5 +1,11 @@
+##Author : Amir Kasseb
+##MIA TASK 8.3 - Advanced Ball Detection
+##DESCRIPTION: This program detects blue and red balls in an image and draws rectangles around them.
+
+# Import the necessary packages
 import cv2 as cv
 import numpy as np
+import os 
 
 # Load the image
 img = cv.imread('images/rb_021.jpg')
@@ -16,7 +22,7 @@ if img.shape[1] > max_width or img.shape[0] > max_height:
     img = cv.resize(img, None, fx=scale_factor, fy=scale_factor, interpolation=cv.INTER_AREA)
 
 # Apply median filtering to reduce noise
-median_filtered = cv.medianBlur(img, 9)
+median_filtered = cv.medianBlur(img, 5)
 
 # Convert the filtered image to HSV color space
 hsv = cv.cvtColor(median_filtered, cv.COLOR_BGR2HSV)
@@ -57,45 +63,53 @@ max_radius = 125
 blue_rectangles = []
 red_rectangles = []
 
+# Define the Y-coordinate threshold for removing rectangles in the lower part of the screen to eliminate noise
+y_threshold = img.shape[0] * 0.8  # Adjust the threshold as needed
+
 # Iterate through the detected blue contours and draw rectangles around blue balls
 for contour in blue_contours:
     contour_area = cv.contourArea(contour)
     if contour_area > min_contour_area:
         x, y, w, h = cv.boundingRect(contour)
-        is_outer = True
+        
+        # Check if the center of the rectangle is above the Y-coordinate threshold to eliminate noise
+        if (y + h // 2) < y_threshold:
+            is_outer = True
+            
+            # Check if the width and height are above the minimum for blue balls
+            if w > min_blue_width and h > min_blue_height:
+                for rect in blue_rectangles:
+                    # Check if the current rectangle is completely contained within another
+                    if x >= rect[0] and y >= rect[1] and x + w <= rect[0] + rect[2] and y + h <= rect[1] + rect[3]:
+                        is_outer = False
+                        break
 
-        # Check if the width and height are above the minimum for blue balls
-        if w > min_blue_width and h > min_blue_height:
-            for rect in blue_rectangles:
-                # Check if the current rectangle is completely contained within another
-                if x >= rect[0] and y >= rect[1] and x + w <= rect[0] + rect[2] and y + h <= rect[1] + rect[3]:
-                    is_outer = False
-                    break
-
-            if is_outer:
-                # Remove any inner rectangles that are already in the list
-                blue_rectangles = [rect for rect in blue_rectangles if not (rect[0] >= x and rect[1] >= y and rect[0] + rect[2] <= x + w and rect[1] + rect[3] <= y + h)]
-                blue_rectangles.append((x, y, w, h))
+                if is_outer:
+                    # Remove any inner rectangles that are already in the list tp eliminate noise
+                    blue_rectangles = [rect for rect in blue_rectangles if not (rect[0] >= x and rect[1] >= y and rect[0] + rect[2] <= x + w and rect[1] + rect[3] <= y + h)]
+                    blue_rectangles.append((x, y, w, h))
 
 # Iterate through the detected red contours and draw rectangles around red balls
 for contour in red_contours:
     contour_area = cv.contourArea(contour)
     x, y, w, h = cv.boundingRect(contour)
 
-    # Check if the width and height are above the minimum for red balls
-    if contour_area > min_contour_area and w > min_red_width and h > min_red_height:
+    # Check if the center of the rectangle is above the Y-coordinate threshold
+    if (y + h // 2) < y_threshold:
         is_outer = True
 
-        for rect in red_rectangles:
-            # Check if the current rectangle is completely contained within another
-            if x >= rect[0] and y >= rect[1] and x + w <= rect[0] + rect[2] and y + h <= rect[1] + rect[3]:
-                is_outer = False
-                break
+        # Check if the width and height are above the minimum for red balls
+        if contour_area > min_contour_area and w > min_red_width and h > min_red_height:
+            for rect in red_rectangles:
+                # Check if the current rectangle is completely contained within another
+                if x >= rect[0] and y >= rect[1] and x + w <= rect[0] + rect[2] and y + h <= rect[1] + rect[3]:
+                    is_outer = False
+                    break
 
-        if is_outer:
-            # Remove any inner rectangles that are already in the list
-            red_rectangles = [rect for rect in red_rectangles if not (rect[0] >= x and rect[1] >= y and rect[0] + rect[2] <= x + w and rect[1] + rect[3] <= y + h)]
-            red_rectangles.append((x, y, w, h))
+            if is_outer:
+                # Remove any inner rectangles that are already in the list to eliminate noise from overlapping balls
+                red_rectangles = [rect for rect in red_rectangles if not (rect[0] >= x and rect[1] >= y and rect[0] + rect[2] <= x + w and rect[1] + rect[3] <= y + h)]
+                red_rectangles.append((x, y, w, h))
 
 # Filter red rectangles by radius
 red_rectangles = [rect for rect in red_rectangles if min_radius <= (rect[2] + rect[3]) / 2 <= max_radius]
@@ -112,5 +126,19 @@ for x, y, w, h in red_rectangles:
 
 # Display the original image with rectangles and labels around the blue and red balls
 cv.imshow('Image with Ball Detection', result_image)
+# Display the original image with rectangles and labels around the blue and red balls
+cv.imshow('Image with Ball Detection', result_image)
+
+# Get the filename without the extension
+filename_without_extension, _ = os.path.splitext(os.path.basename('images/rb_021.jpg'))
+
+# Specify the output directory
+output_directory = 'output/'
+
+
+# Save the output image with the same name as the input file in the "output" folder
+output_path = os.path.join(output_directory, f'{filename_without_extension}_output.jpg')
+cv.imwrite(output_path, result_image)
+
 cv.waitKey(0)
 cv.destroyAllWindows()
