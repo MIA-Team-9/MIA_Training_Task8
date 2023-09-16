@@ -35,7 +35,8 @@ This project aims to create an object detection model capable of identifying Egy
 
 - The model was trained using GPUs and cloud-based services to expedite the process on google colab.
 - Regular evaluation on the validation set was performed to monitor and fine-tune the model.
-- The model was retrained on the same data in order to improve it's 
+- The model was retrained on the same data in order to improve it's efficiency.
+- 
 ### Step 6: Model Evaluation
 
 - The trained model was evaluated on a separate test dataset.
