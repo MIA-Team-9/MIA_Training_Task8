@@ -46,4 +46,4 @@ This project aims to create an object detection model capable of identifying Egy
 
 This project successfully developed an object detection model using the YOLOv8 Ultralytics framework to detect and classify Egyptian coins (One pound, Half pound, Quart pound). The process involved thorough data collection, annotation, model training, and collaborative efforts among team members.
 
-For detailed steps, code and implementation, please refer to [Drive of the model training](https://github.com/your-username/your-repo).
+For detailed steps, code and implementation, please refer to [Drive of the model training](https://drive.google.com/drive/folders/1to2IU9c10m5mOY8SwWUreQvmX3LplEdz?usp=sharing).
